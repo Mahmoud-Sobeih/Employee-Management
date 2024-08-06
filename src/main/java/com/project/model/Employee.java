@@ -34,6 +34,10 @@ public class Employee {
 	@NotEmpty
 	@Column(name = "email")
 	private String email;
+
+	@NotEmpty
+	@Column(name = "password")
+	private String password;
 	
 	@NotEmpty
 	@Column(name = "job_title")

@@ -45,6 +45,11 @@ public class DepartmentService {
         return departmentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Department with ID: " + id + " Not Found"));
     }
 
+    @Cacheable(value = "fetchDepartment", key = "#name")
+    public Department getDepartmentByName(String name){
+        return departmentRepository.getDepartmentByName(name).orElseThrow(() -> new ResourceNotFoundException("Department with name: " + name + " Not Found"));
+    }
+
     @Cacheable(value = "EmployeesByDepartment", key = "#departmentId")
     public List<Employee> getAllEmployeesByDepartment(int departmentId) {
         List<Employee> employeesList = null;
