@@ -2,7 +2,6 @@ package com.project.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -32,8 +31,11 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/api/v1")
 public class EmployeeController {
 
-	@Autowired
-	private EmployeeService employeeService;
+	private final EmployeeService employeeService;
+
+	public EmployeeController(EmployeeService employeeService) {
+		this.employeeService = employeeService;
+	}
 
 	@Operation(
 		summary = "Insert Employee", 
@@ -46,7 +48,7 @@ public class EmployeeController {
 	})
 	@PostMapping("employee")
 	public ResponseEntity<Employee> saveEmployee(@RequestBody Employee employee) {
-		log.info("Insert new employee: " + employee.toString());
+		log.info("Insert new employee: {}", employee.toString());
 		return new ResponseEntity<>(employeeService.saveOrUpdateEmployee(employee), HttpStatus.CREATED);
 	}
 
@@ -77,7 +79,7 @@ public class EmployeeController {
 	})
 	@GetMapping("employee/{id}")
 	public ResponseEntity<Employee> getEmployeeById(@PathVariable Long id) {
-		log.info("get employee by id: " + id);
+		log.info("get employee by id: {}", id);
 		return new ResponseEntity<>(employeeService.getEmployeeById(id), HttpStatus.OK);
 	}
 
@@ -94,7 +96,7 @@ public class EmployeeController {
 	@PutMapping("employee")
 	public ResponseEntity<Employee> updateEmployee(@RequestBody Employee employee) {
 
-		log.info("Update employee by new values: " + employee.toString());
+		log.info("Update employee by new values: {}", employee.toString());
 		return new ResponseEntity<>(employeeService.saveOrUpdateEmployee(employee), HttpStatus.OK);
 	}
 
@@ -110,7 +112,7 @@ public class EmployeeController {
 	@DeleteMapping("employee/{id}")
 	public ResponseEntity<String> deleteEmployee(@PathVariable Long id) {
 
-		log.info("delete employee with id: " + id);
+		log.info("delete employee with id: {}", id);
 		employeeService.deleteEmployee(id);
 
 		return new ResponseEntity<>("Employee deleted successfully", HttpStatus.OK);

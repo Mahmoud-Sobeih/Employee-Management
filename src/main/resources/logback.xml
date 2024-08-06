@@ -2,7 +2,7 @@
 
 <configuration>
 
-    <property name="DEV_HOME" value="/var/log/EmployeeManagment"/>
+    <property name="DEV_HOME" value="/var/log/EmployeeManagement"/>
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
 

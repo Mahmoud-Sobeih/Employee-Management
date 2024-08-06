@@ -33,21 +33,24 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("api/v1")
 public class DepartmentController {
     
-    @Autowired
-    private DepartmentService departmentService;
+    private final DepartmentService departmentService;
 
-    @Operation(
+	public DepartmentController(DepartmentService departmentService) {
+		this.departmentService = departmentService;
+	}
+
+	@Operation(
 		summary = "Insert Department", 
-		description = "Insert new deparment."
+		description = "Insert new department."
 	)
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", content = {@Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")}),
 		@ApiResponse(responseCode = "404", content = {@Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application/json")}),
 		@ApiResponse(responseCode = "500", content = {@Content(schema = @Schema(implementation = ExceptionResponse.class), mediaType = "application.json")})
 	})
-	@PostMapping("dapartment")
+	@PostMapping("department")
 	public ResponseEntity<Department> saveDepartment(@RequestBody Department department) {
-		log.info("Insert new depatment: " + department.toString());
+		log.info("Insert new department: {}", department.toString());
 		return new ResponseEntity<>(departmentService.addOrUpdateDepartment(department), HttpStatus.CREATED);
 	}
 
@@ -78,7 +81,7 @@ public class DepartmentController {
 	})
 	@GetMapping("department/{id}")
 	public ResponseEntity<Department> getDepartmentById(@PathVariable int id) {
-		log.info("get department by id: " + id);
+		log.info("get department by id: {}", id);
 		return new ResponseEntity<>(departmentService.getDepartmentById(id), HttpStatus.OK);
 	}
 
@@ -94,7 +97,7 @@ public class DepartmentController {
 	})
 	@GetMapping("department/{id}/employees")
 	public ResponseEntity<List<Employee>> getAllEmployeesInDepartment(@PathVariable int id) {
-		log.info("get all employess in department with id: " + id);
+		log.info("get all employees in department with id: {}", id);
 		return new ResponseEntity<>(departmentService.getAllEmployeesByDepartment(id), HttpStatus.OK);
 	}
 
@@ -111,7 +114,7 @@ public class DepartmentController {
 	@PutMapping("department")
 	public ResponseEntity<Department> updateDepartment(@RequestBody Department department) {
 
-		log.info("Update department by new values: " + department.toString());
+		log.info("Update department by new values: {}", department.toString());
 		return new ResponseEntity<>(departmentService.addOrUpdateDepartment(department), HttpStatus.OK);
 	}
 
@@ -127,9 +130,9 @@ public class DepartmentController {
 	@DeleteMapping("department/{id}")
 	public ResponseEntity<String> deleteEmployee(@PathVariable int id) {
 
-		log.info("delete employee with id: " + id);
+		log.info("delete employee with id: {}", id);
 		departmentService.deleteDepartment(id);
 
-		return new ResponseEntity<String>("Department deleted successfully", HttpStatus.OK);
+		return new ResponseEntity<>("Department deleted successfully", HttpStatus.OK);
 	}
 }

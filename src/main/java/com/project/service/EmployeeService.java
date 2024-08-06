@@ -2,13 +2,15 @@ package com.project.service;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import com.project.config.exception.exceptions.ResourceNotFoundException;
 import com.project.model.Employee;
 import com.project.repository.EmployeeRepository;
-import com.project.service.EmployeeService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,9 +18,13 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class EmployeeService {
 
-	@Autowired
-	private EmployeeRepository employeeRepository;
+	private final EmployeeRepository employeeRepository;
 
+	public EmployeeService(EmployeeRepository employeeRepository) {
+		this.employeeRepository = employeeRepository;
+	}
+
+	@CachePut(value = "fetchEmployee", key = "#employee.id")
 	public Employee saveOrUpdateEmployee(Employee employee) {
 		Employee savedEmployee = null;
 		try {
@@ -29,6 +35,7 @@ public class EmployeeService {
 		return savedEmployee;
 	}
 
+	@Cacheable(value = "fetchAllEmployees")
 	public List<Employee> getAllEmployees() {
 		List<Employee> employeesList = null;
 		try {
@@ -39,10 +46,15 @@ public class EmployeeService {
 		return employeesList;
 	}
 
+	@Cacheable(value = "fetchEmployee", key = "#id")
 	public Employee getEmployeeById(Long id) {
 		return employeeRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Employee with ID: " + id + " Not Found"));
 	}
 
+	@Caching(evict = {
+			@CacheEvict("fetchAllEmployees"),
+			@CacheEvict(value = "EmployeesByDepartment", allEntries = true),
+			@CacheEvict(value="fetchEmployee", key="#id") })
 	public void deleteEmployee(Long id) {
 		try {
 			employeeRepository.deleteById(id);

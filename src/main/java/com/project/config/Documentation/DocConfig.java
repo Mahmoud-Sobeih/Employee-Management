@@ -13,17 +13,16 @@ import io.swagger.v3.oas.models.servers.Server;
 
 @Configuration
 public class DocConfig {
-     private String devUrl = "http://localhost:8080";
-
-    private String prodUrl = "https://production-api.com";
 
     @Bean
     public OpenAPI myOpenAPI() {
         Server devServer = new Server();
+        String devUrl = "http://localhost:8080";
         devServer.setUrl(devUrl);
         devServer.setDescription("Server URL in Development environment");
 
         Server prodServer = new Server();
+        String prodUrl = "https://production-api.com";
         prodServer.setUrl(prodUrl);
         prodServer.setDescription("Server URL in Production environment");
 
