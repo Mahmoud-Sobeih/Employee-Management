@@ -11,7 +11,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Slf4j
 @Tag(name = "Authentication", description = "Authentication APIs")
 @RequestMapping("/auth")
 public class AuthController {
@@ -42,7 +40,6 @@ public class AuthController {
     })
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> signin(@RequestBody LoginRequest request){
-        log.info("User {} Login", request.getUserName());
         return new ResponseEntity<>(authService.login(request), HttpStatus.OK);
     }
 
@@ -57,7 +54,6 @@ public class AuthController {
     })
     @PostMapping("/signup")
     public ResponseEntity<String> signup(@RequestBody SignupRequest request){
-        log.info("Register new Employee: {} {}", request.getFirstName(), request.getLastName());
         return new ResponseEntity<>(authService.signup(request), HttpStatus.CREATED);
     }
 }

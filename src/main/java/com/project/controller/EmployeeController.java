@@ -26,9 +26,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @RestController
 @Tag(name = "Employee", description = "Employee management APIs")
 @SecurityScheme(name = "JWT", description = "Generate your JWT when you log in.", scheme = "bearer", type = SecuritySchemeType.HTTP, bearerFormat = "JWT")
@@ -53,7 +51,6 @@ public class EmployeeController {
     })
     @PostMapping("employee")
     public ResponseEntity<Employee> saveEmployee(@RequestBody Employee employee) {
-        log.info("Insert new employee: {}", employee.toString());
         return new ResponseEntity<>(employeeService.saveOrUpdateEmployee(employee), HttpStatus.CREATED);
     }
 
@@ -70,7 +67,6 @@ public class EmployeeController {
     })
     @GetMapping("employees")
     public ResponseEntity<List<Employee>> getAllEmployees() {
-        log.info("get all employees");
         return new ResponseEntity<>(employeeService.getAllEmployees(), HttpStatus.OK);
     }
 
@@ -87,7 +83,6 @@ public class EmployeeController {
     })
     @GetMapping("employee/{id}")
     public ResponseEntity<Employee> getEmployeeById(@PathVariable Long id) {
-        log.info("get employee by id: {}", id);
         return new ResponseEntity<>(employeeService.getEmployeeById(id), HttpStatus.OK);
     }
 
@@ -104,8 +99,6 @@ public class EmployeeController {
     })
     @PutMapping("employee")
     public ResponseEntity<Employee> updateEmployee(@RequestBody Employee employee) {
-
-        log.info("Update employee by new values: {}", employee.toString());
         return new ResponseEntity<>(employeeService.saveOrUpdateEmployee(employee), HttpStatus.OK);
     }
 
@@ -122,10 +115,7 @@ public class EmployeeController {
     })
     @DeleteMapping("employee/{id}")
     public ResponseEntity<String> deleteEmployee(@PathVariable Long id) {
-
-        log.info("delete employee with id: {}", id);
         employeeService.deleteEmployee(id);
-
         return new ResponseEntity<>("Employee deleted successfully", HttpStatus.OK);
     }
 }

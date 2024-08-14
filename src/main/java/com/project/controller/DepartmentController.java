@@ -5,7 +5,6 @@ import java.util.List;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -28,10 +27,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.extern.slf4j.Slf4j;
 
 @RestController
-@Slf4j
 @Tag(name = "Department", description = "Department management APIs")
 @SecurityScheme(name = "JWT", description = "Generate your JWT when you log in.", scheme = "bearer", type = SecuritySchemeType.HTTP, bearerFormat = "JWT")
 @RequestMapping("api/v1")
@@ -55,7 +52,6 @@ public class DepartmentController {
     })
     @PostMapping("department")
     public ResponseEntity<Department> saveDepartment(@RequestBody Department department) {
-        log.info("Insert new department: {}", department.toString());
         return new ResponseEntity<>(departmentService.addOrUpdateDepartment(department), HttpStatus.CREATED);
     }
 
@@ -72,7 +68,6 @@ public class DepartmentController {
     })
     @GetMapping("departments")
     public ResponseEntity<List<Department>> getAllDepartments() {
-        log.info("get all departments");
         return new ResponseEntity<>(departmentService.getAllDepartments(), HttpStatus.OK);
     }
 
@@ -89,7 +84,6 @@ public class DepartmentController {
     })
     @GetMapping("department/{id}")
     public ResponseEntity<Department> getDepartmentById(@PathVariable int id) {
-        log.info("get department by id: {}", id);
         return new ResponseEntity<>(departmentService.getDepartmentById(id), HttpStatus.OK);
     }
 
@@ -106,7 +100,6 @@ public class DepartmentController {
     })
     @GetMapping("department/{id}/employees")
     public ResponseEntity<List<Employee>> getAllEmployeesInDepartment(@PathVariable int id) {
-        log.info("get all employees in department with id: {}", id);
         return new ResponseEntity<>(departmentService.getAllEmployeesByDepartment(id), HttpStatus.OK);
     }
 
@@ -123,8 +116,6 @@ public class DepartmentController {
     })
     @PutMapping("department")
     public ResponseEntity<Department> updateDepartment(@RequestBody Department department) {
-
-        log.info("Update department by new values: {}", department.toString());
         return new ResponseEntity<>(departmentService.addOrUpdateDepartment(department), HttpStatus.OK);
     }
 
@@ -141,10 +132,7 @@ public class DepartmentController {
     })
     @DeleteMapping("department/{id}")
     public ResponseEntity<String> deleteEmployee(@PathVariable int id) {
-
-        log.info("delete employee with id: {}", id);
         departmentService.deleteDepartment(id);
-
         return new ResponseEntity<>("Department deleted successfully", HttpStatus.OK);
     }
 }
