@@ -2,14 +2,11 @@ package com.project.config.security;
 
 import com.project.DTO.LoginRequest;
 import com.project.DTO.LoginResponse;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Clock;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import com.project.config.exception.exceptions.AuthenticationException;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.impl.DefaultClock;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -48,7 +45,6 @@ public class JWTTokenUtil {
         return loginResponse;
     }
 
-
     private Date calculateExpirationDate(Date createdDate) {
         long expiration = expirationDuration;
         return new Date(createdDate.getTime() + expiration*1000);
@@ -59,27 +55,29 @@ public class JWTTokenUtil {
     }
 
     public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = getAllClaimsFromToken(token);
+        final Claims claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
 //        log.info("claims: {}", claims.toString());
         return claimsResolver.apply(claims);
     }
 
-    private Claims getAllClaimsFromToken(String token) {
-        return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
+    public Boolean validateToken(String token) {
+        try {
+            Jwts.parser().setSigningKey(secret).parse(token);
+            return true;
+
+        } catch (MalformedJwtException e) {
+            log.error("Invalid JWT Token", e);
+            throw new AuthenticationException("Invalid JWT Token");
+        }catch(ExpiredJwtException e){
+            log.error("JWT Token is Expired", e);
+            throw new AuthenticationException("JWT Token has expired");
+        }catch(UnsupportedJwtException e){
+            log.error("Unsupported JWT", e);
+            throw new AuthenticationException("Unsupported JWT Token");
+        }catch(IllegalArgumentException e){
+            log.error("JWT Payload is Empty", e);
+            throw new AuthenticationException("Unable to get JWT Token");
+        }
     }
 
-    public Boolean validateToken(String token, UserDetails userDetails) {
-        JwtUserDetails user = (JwtUserDetails) userDetails;
-        final String username = getUsernameFromToken(token);
-        return (username.equals(user.getUsername()) && !isTokenExpired(token));
-    }
-
-    public Boolean isTokenExpired(String token) {
-        final Date expiration = getExpirationDateFromToken(token);
-        return expiration.before(clock.now());
-    }
-
-    public Date getExpirationDateFromToken(String token) {
-        return getClaimFromToken(token, Claims::getExpiration);
-    }
 }

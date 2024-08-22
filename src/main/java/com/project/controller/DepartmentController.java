@@ -132,7 +132,6 @@ public class DepartmentController {
     })
     @DeleteMapping("department/{id}")
     public ResponseEntity<String> deleteEmployee(@PathVariable int id) {
-        departmentService.deleteDepartment(id);
-        return new ResponseEntity<>("Department deleted successfully", HttpStatus.OK);
+        return new ResponseEntity<>(departmentService.deleteDepartment(id), HttpStatus.OK);
     }
 }

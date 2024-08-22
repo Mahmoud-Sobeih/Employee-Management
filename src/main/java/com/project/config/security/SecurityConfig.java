@@ -15,9 +15,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final AuthFilter authFilter;
+    private final AuthEntryPointJwt authEntryPointJwt;
 
-    public SecurityConfig(AuthFilter authFilter) {
+    public SecurityConfig(AuthFilter authFilter, AuthEntryPointJwt authEntryPointJwt) {
         this.authFilter = authFilter;
+        this.authEntryPointJwt = authEntryPointJwt;
     }
 
     @Bean
@@ -35,6 +37,9 @@ public class SecurityConfig {
         http
                 .csrf().disable()
                 .cors().disable()
+                .exceptionHandling()
+                .authenticationEntryPoint(authEntryPointJwt)
+                .and()
                 .authorizeRequests()
                 .antMatchers("/auth/**", "/APIDocumentation.html", "/swagger-ui-custom.html", "/swagger-ui/index.html", "/swagger", "/swagger.yaml").permitAll()
                 .anyRequest().authenticated()

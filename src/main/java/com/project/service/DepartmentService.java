@@ -76,12 +76,14 @@ public class DepartmentService {
             @CacheEvict("fetchAllDepartments"),
             @CacheEvict(value = "EmployeesByDepartment", key = "#id"),
             @CacheEvict(value="fetchDepartment", key="#id") })
-    public void deleteDepartment(int id){
+    public String deleteDepartment(int id){
         try {
             departmentRepository.deleteById(id);
+            return "Department with ID: " + id + " Deleted";
         } catch (Exception e) {
             log.error("Error in delete a department with id: {}", id, e);
         }
+        return "Department with ID: " + id + " Not Found";
     }
 
 }

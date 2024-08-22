@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -31,43 +32,30 @@ public class AuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         final String requestTokenHeader = request.getHeader("Authorization");
-
-        String email;
-        String JWTToken;
-
         if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer") && requestTokenHeader.length() > 7) {
-            JWTToken = requestTokenHeader.substring(7);
+
+            String JWTToken = requestTokenHeader.substring(7);
             try {
-
-                email = jwtTokenUtil.getUsernameFromToken(JWTToken);
-
-                if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-
+                // Check expiration of token
+                if (jwtTokenUtil.validateToken(JWTToken)) {
+                    String email = jwtTokenUtil.getUsernameFromToken(JWTToken);
                     UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(email);
-
-                    // Check expiration of token
-                    if (jwtTokenUtil.validateToken(JWTToken, userDetails)) {
-                        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-                                userDetails, null, userDetails.getAuthorities());
-                        usernamePasswordAuthenticationToken
-                                .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                        // After setting the Authentication in the context, we specify
-                        // that the current user is authenticated. So it passes the
-                        // Spring Security Configurations successfully.
-                        SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-                    }else {
-                        log.error("JWT Token has expired");
-                        throw new AuthenticationException("JWT Token has expired");
-                    }
+                    UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+                            userDetails, null, userDetails.getAuthorities());
+                    usernamePasswordAuthenticationToken
+                            .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    // After setting the Authentication in the context, we specify
+                    // that the current user is authenticated. So it passes the
+                    // Spring Security Configurations successfully.
+                    SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
                 }
-            } catch (IllegalArgumentException e) {
-                log.error("AuthException-IllegalArgumentException", e);
-                throw new AuthenticationException("Unable to get JWT Token");
-            } catch (ExpiredJwtException e) {//
-                log.error("AuthException-ExpiredJwtException", e);
-                throw new AuthenticationException("JWT Token has expired");
+
+            } catch (UsernameNotFoundException ex) {
+                log.error("UserName not found Exception", ex);
+                throw new UsernameNotFoundException("Invalid userName or password!!");
             }
-        }else{
+
+        } else {
             log.info("User didn't have JWT Token");
         }
 

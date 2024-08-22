@@ -55,13 +55,14 @@ public class EmployeeService {
 			@CacheEvict("fetchAllEmployees"),
 			@CacheEvict(value = "EmployeesByDepartment", allEntries = true),
 			@CacheEvict(value="fetchEmployee", key="#id") })
-	public void deleteEmployee(Long id) {
+	public String deleteEmployee(Long id) {
 		try {
 			employeeRepository.deleteById(id);
+			return "Employee with ID: " + id + " Deleted";
 		} catch (Exception e) {
 			log.error("Error in delete an employee", e);
 		}
-		
+		return "Employee with ID: " + id + " Not Found";
 	}
 
 }
