@@ -77,6 +77,9 @@ public class JWTTokenUtil {
         }catch(IllegalArgumentException e){
             log.error("JWT Payload is Empty", e);
             throw new AuthenticationException("Unable to get JWT Token");
+        }catch (Exception ex){
+            log.error("Exception occurred while validating JWT Token", ex);
+            throw new AuthenticationException("Exception occurred while validating JWT Token");
         }
     }
 

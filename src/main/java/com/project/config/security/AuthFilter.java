@@ -1,7 +1,5 @@
 package com.project.config.security;
 
-import com.project.config.exception.exceptions.AuthenticationException;
-import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -30,12 +28,10 @@ public class AuthFilter extends OncePerRequestFilter {
     }
 
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-
-        final String requestTokenHeader = request.getHeader("Authorization");
-        if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer") && requestTokenHeader.length() > 7) {
-
-            String JWTToken = requestTokenHeader.substring(7);
-            try {
+        try {
+            final String requestTokenHeader = request.getHeader("Authorization");
+            if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer") && requestTokenHeader.length() > 7) {
+                String JWTToken = requestTokenHeader.substring(7);
                 // Check expiration of token
                 if (jwtTokenUtil.validateToken(JWTToken)) {
                     String email = jwtTokenUtil.getUsernameFromToken(JWTToken);
@@ -48,17 +44,22 @@ public class AuthFilter extends OncePerRequestFilter {
                     // that the current user is authenticated. So it passes the
                     // Spring Security Configurations successfully.
                     SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+                } else {
+                    log.error("Invalid JWT token");
+                    SecurityContextHolder.clearContext();
                 }
-
-            } catch (UsernameNotFoundException ex) {
-                log.error("UserName not found Exception", ex);
-                throw new UsernameNotFoundException("Invalid userName or password!!");
+            } else {
+                log.info("User didn't have JWT Token");
+                SecurityContextHolder.clearContext();
             }
-
-        } else {
-            log.info("User didn't have JWT Token");
+        } catch (UsernameNotFoundException ex) {
+            log.error("UserName not found Exception", ex);
+            SecurityContextHolder.clearContext();
+            throw new UsernameNotFoundException("Invalid userName or password!!");
+        } catch (Exception ex) {
+            log.error("Exception in doFilterInternal", ex);
+            SecurityContextHolder.clearContext();
         }
-
         filterChain.doFilter(request, response);
     }
 }
