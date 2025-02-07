@@ -9,11 +9,19 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotEmpty;
 
 import lombok.Data;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+
+import java.io.Serializable;
 
 @Data
 @Entity
 @Table(name = "departments")
-public class Department {
+@SQLDelete(sql = "UPDATE departments SET deleted = true WHERE id=?")
+@Where(clause = "deleted=false")
+public class Department implements Serializable {
+
+	private static final long serialVersionUID = 1L;
     
     @Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,4 +31,6 @@ public class Department {
 	@Column(name = "name")
 	private String name;
 
+	@Column(name = "deleted", nullable = false)
+	private Boolean isDeleted;
 }

@@ -11,13 +11,20 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotEmpty;
 
 import lombok.Data;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
+import java.io.Serializable;
 
 
 @Data
 @Entity
 @Table(name = "employee")
-public class Employee {
+@SQLDelete(sql = "UPDATE employee SET deleted = true where id=?")
+@Where(clause = "deleted=false")
+public class Employee implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,6 +53,9 @@ public class Employee {
 	@NotEmpty
 	@Column(name = "salary")
 	private Double salary;
+
+	@Column(name = "deleted", nullable = false)
+	private Boolean isDeleted;
 
 	@ManyToOne
 	@JoinColumn(name = "departmentId")
